@@ -7,8 +7,8 @@ module.exports = configureInfusionsoftJwt;
 function configureInfusionsoftJwt(app) {
     let infusionsoft = functions.config().infusionsoft || {};
     let cas = infusionsoft.cas || {};
-    let requestsPerMinute = cas.requestsPerMinute || 5;
-    let jwksUri = `${cas.baseUrl || 'https://signin.infusionsoft.com'}/jwt/keys`;
+    let requestsPerMinute = cas.requests_per_minute || 5;
+    let jwksUri = `${cas.url || 'https://signin.infusionsoft.com'}/jwt/keys`;
 
     let config = {
         secret: jwksRsa.expressJwtSecret({
