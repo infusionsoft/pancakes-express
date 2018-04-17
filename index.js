@@ -20,6 +20,8 @@ function configureInfusionsoftJwt(app) {
         algorithms: ['RS256']
     };
 
+    console.log('jwksUri', jwksUri);
+
     app.use(jwt(config));
 
     app.use(function(err, req, res, next) {
