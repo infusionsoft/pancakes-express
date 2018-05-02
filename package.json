@@ -1,18 +1,19 @@
 {
-  "name": "@infusionsoft/jwt-express",
+  "name": "@infusionsoft/pancakes-express",
   "version": "0.0.1",
-  "description": "Express Middleware to authenticate Infusionsoft JWTs",
+  "description": "Express Middleware to do pancakes type things",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/infusionsoft/jwt-express.git"
+    "url": "git+https://github.com/infusionsoft/pancakes-express.git"
   },
   "bugs": {
-    "url": "https://github.com/infusionsoft/jwt-express/issues"
+    "url": "https://github.com/infusionsoft/pancakes-express/issues"
   },
   "private": true,
   "scripts": {},
   "dependencies": {
     "express-jwt": "^5.3.1",
+    "express-unless": "^0.5.0",
     "firebase-admin": "^5.12.0",
     "firebase-functions": "^1.0.1",
     "jwks-rsa": "^1.2.1"

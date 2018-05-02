@@ -1,32 +1,58 @@
-const jwt = require('express-jwt');
 const functions = require('firebase-functions');
+const jwt = require('express-jwt');
 const jwksRsa = require('jwks-rsa');
 
-module.exports = configureInfusionsoftJwt;
+module.exports.configure = configure;
 
-function configureInfusionsoftJwt(app) {
-    let infusionsoft = functions.config().infusionsoft || {};
-    let cas = infusionsoft.cas || {};
-    let requestsPerMinute = cas.requests_per_minute || 5;
-    let jwksUri = `${cas.url || 'https://signin.infusionsoft.com'}/jwt/keys`;
+const _defaultConfig = {
+    unless: {},
+    infusionsoft: {
+        cas: {
+            requests_per_minute: 5,
+            url: 'https://signin.infusionsoft.com'
+        }
+    }
+};
+
+/**
+ * Parse JWT Authorization Bearer tokens `req.user`.
+ *
+ * @param {express} [app] An express application instance.
+ * @param {Object} [config]
+ * @return {Function}
+ * @public
+ */
+
+function configure(app, config) {
+    console.log('config', config);
+
+    let firebaseConfig = functions.config();
+    console.log('firebaseConfig', firebaseConfig);
+
+    let resolvedConfig = Object.assign(_defaultConfig, config, firebaseConfig);
+    console.log('resolvedConfig', resolvedConfig);
+
+    app.use(_jwt(resolvedConfig).unless(resolvedConfig.unless));
+
+    app.use(function (err, req, res, next) {
+        if (err.name === 'UnauthorizedError') {
+            res.status(401).send({error: 'Invalid Token'});
+        }
+    });
+}
+
+function _jwt(resolvedConfig) {
+    let jwksUri = `${resolvedConfig.infusionsoft.cas.url}/jwt/keys`;
 
     let config = {
         secret: jwksRsa.expressJwtSecret({
             cache: true,
             rateLimit: true,
-            jwksRequestsPerMinute: requestsPerMinute,
+            jwksRequestsPerMinute: resolvedConfig.infusionsoft.cas.requests_per_minute,
             jwksUri: jwksUri
         }),
         algorithms: ['RS256']
     };
 
-    console.log('jwksUri', jwksUri);
-
-    app.use(jwt(config));
-
-    app.use(function(err, req, res, next) {
-        if (err.name === 'UnauthorizedError') {
-            res.status(401).send({error: 'Invalid Token'});
-        }
-    });
+    return jwt(config);
 }
